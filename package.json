@@ -1,0 +1,48 @@
+{
+  "name": "elia",
+  "version": "0.1.0",
+  "description": "elia — an open design system for AI-native interfaces. Tokens, base components, and agent primitives for React 19 + Tailwind v4.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": ["*.css"],
+  "keywords": [
+    "design-system",
+    "react",
+    "tailwind",
+    "ai",
+    "components",
+    "ui",
+    "agent"
+  ],
+  "files": ["dist", "styles", "src", "README.md"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./src": "./src/index.ts",
+    "./styles/elia.css": "./styles/elia.css",
+    "./styles/neutral.css": "./styles/neutral.css",
+    "./styles/aile.css": "./styles/aile.css"
+  },
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "tsup"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tsup": "^8",
+    "typescript": "^5.8.0"
+  },
+  "dependencies": {
+    "glimm": "^0.3.0",
+    "iconoir-react": "^7.12.1",
+    "liveline": "^0.0.7"
+  }
+}

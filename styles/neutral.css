@@ -1,0 +1,70 @@
+/* ═══════════════════════════════════════════════════════════
+ * elia · neutral theme
+ *
+ * A cool neutral palette as an alternate skin. Import AFTER
+ * elia.css to override the AILE brand tokens — components are
+ * token-driven, nothing else changes.
+ *
+ *   @import "elia/styles/elia.css";
+ *   @import "elia/styles/neutral.css";
+ * ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --page: #fafafb;
+  --canvas: #f1f2f3;
+  --surface: #fff;
+  --inset: #f7f8f9;
+  --hover: #f4f5f6;
+  --hover-2: #e7e9eb;
+  --field: #f2f2f3;
+  --ink: #1f2124;
+  --ink-2: #62656b;
+  --ink-3: #9a9da3;
+  --line: #ecedef;
+  --line-strong: #e0e2e5;
+  --stripe: #49494913;
+  --stripe-bg: #f5f5f5;
+  --accent: #0285ff;
+  --accent-ink: #0170dd;
+  --accent-tint: #e9f3ff;
+  --green: #189a4d;
+  --green-tint: #e8f5ed;
+  --orange: #ef720c;
+  --orange-tint: #fdf1e5;
+  --red: #e3474c;
+  --red-tint: #fcecec;
+  --tooltip-bg: #25272b;
+  --tooltip-fg: #f6f7f8;
+  --tooltip-muted: #a5a8ad;
+  --tooltip-border: #3a3c40;
+}
+
+.dark {
+  --page: #17181a;
+  --canvas: #1c1d1f;
+  --surface: #232427;
+  --inset: #1f2022;
+  --hover: #2a2b2e;
+  --hover-2: #313236;
+  --field: #2b2c2f;
+  --ink: #f2f3f4;
+  --ink-2: #a5a8ad;
+  --ink-3: #6c6f75;
+  --line: #2e3033;
+  --line-strong: #3a3c40;
+  --stripe: #ffffff0e;
+  --stripe-bg: #1b1c1e;
+  --accent: #3d9aff;
+  --accent-ink: #7ec0ff;
+  --accent-tint: #3d9aff29;
+  --green: #3dbb72;
+  --green-tint: #3dbb7224;
+  --orange: #f68f3c;
+  --orange-tint: #f68f3c24;
+  --red: #ee5c61;
+  --red-tint: #ee5c6124;
+  --tooltip-bg: #111214;
+  --tooltip-fg: #f2f3f4;
+  --tooltip-muted: #a5a8ad;
+  --tooltip-border: #2e3033;
+}

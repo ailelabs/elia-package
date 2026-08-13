@@ -1,0 +1,629 @@
+/* ═══════════════════════════════════════════════════════════
+ * ELIA — the AILE.SH design system
+ *
+ * Foundations file. Everything themable lives here as CSS
+ * custom properties; components only ever reference tokens.
+ *
+ *   1. Theme bridge     Tailwind v4 @theme mapping
+ *   2. Color tokens     light (:root) · dark (.dark) · band
+ *   3. Ailesh aliases   the vocabulary aile.sh already speaks
+ *   4. Base             page chrome, font smoothing
+ *   5. Motion           shared keyframes
+ *   6. Component CSS    primitives that need real selectors
+ *
+ * Token values are the AILE brand: warm paper, ink, indigo.
+ * ═══════════════════════════════════════════════════════════ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── 1 · theme bridge ───────────────────────────────────── */
+
+@theme inline {
+  --color-page: var(--page);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-inset: var(--inset);
+  --color-hover: var(--hover);
+  --color-hover-2: var(--hover-2);
+  --color-field: var(--field);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-tint: var(--accent-tint);
+  --color-green: var(--green);
+  --color-green-tint: var(--green-tint);
+  --color-orange: var(--orange);
+  --color-orange-tint: var(--orange-tint);
+  --color-red: var(--red);
+  --color-red-tint: var(--red-tint);
+
+  --shadow-hairline: var(--shadow-hairline);
+  --shadow-btn: var(--shadow-btn);
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-overlay: var(--shadow-overlay);
+  --shadow-inset-field: var(--shadow-inset-field);
+
+  --radius-chip: 6px;
+  --radius-control: 8px;
+  --radius-card: 10px;
+
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-link: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --font-sans: "Inter Tight", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+}
+
+/* ── 2 · color tokens ───────────────────────────────────── */
+
+:root {
+  /* surfaces — warm paper */
+  --page: #f4f1ea;
+  --canvas: #ece8dd;
+  --surface: #ffffff;
+  --inset: #f8f6ef;
+  --hover: #f1eee5;
+  --hover-2: #e7e3d6;
+  --field: #f2efe7;
+
+  /* ink */
+  --ink: #141310;
+  --ink-2: #5b574c;
+  --ink-3: #8f8a7b;
+
+  /* structure */
+  --line: #e0dbce;
+  --line-strong: #c9c3b2;
+  --stripe: #14131013;
+  --stripe-bg: #efebe1;
+
+  /* brand accent — AILE indigo */
+  --accent: #4f46e5;
+  --accent-ink: #4338ca;
+  --accent-tint: #edecfc;
+
+  /* status */
+  --green: #17813f;
+  --green-tint: #e7f2eb;
+  --orange: #b45309;
+  --orange-tint: #f8efe3;
+  --red: #c2281d;
+  --red-tint: #f9eae8;
+
+  /* inverted tooltip surface */
+  --tooltip-bg: #1f1d18;
+  --tooltip-fg: #f4f1ea;
+  --tooltip-muted: #a9a498;
+  --tooltip-border: #3a382f;
+
+  /* elevation */
+  --shadow-hairline: 0 0 0 1px var(--line);
+  --shadow-btn: 0 0 0 1px var(--line-strong), 0 1px 2px #1413100d;
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px #1413100a, 0 2px 6px #14131008;
+  --shadow-raised: 0 0 0 1px var(--line), 0 2px 10px #0000000b;
+  --shadow-overlay: 0 0 0 1px var(--line), 0 8px 28px #0001;
+  --shadow-inset-field: inset 0 1px 2px #0000001f;
+}
+
+.dark {
+  --page: #0c0b0e;
+  --canvas: #121114;
+  --surface: #1a191e;
+  --inset: #17161a;
+  --hover: #232228;
+  --hover-2: #2b2a31;
+  --field: #201f25;
+
+  --ink: #f4f1ea;
+  --ink-2: #a9a498;
+  --ink-3: #7c7869;
+
+  --line: #28272c;
+  --line-strong: #3a3940;
+  --stripe: #ffffff0e;
+  --stripe-bg: #0a090c;
+
+  --accent: #6d64f0;
+  --accent-ink: #7c74f2;
+  --accent-tint: #6d64f029;
+
+  --green: #3fcf77;
+  --green-tint: #3fcf7724;
+  --orange: #d9822b;
+  --orange-tint: #d9822b24;
+  --red: #e5544a;
+  --red-tint: #e5544a24;
+
+  --tooltip-bg: #111013;
+  --tooltip-fg: #f4f1ea;
+  --tooltip-muted: #a9a498;
+  --tooltip-border: #2e2d33;
+
+  --shadow-hairline: 0 0 0 1px var(--line);
+  --shadow-btn: 0 0 0 1px var(--line-strong), 0 1px 2px #0000004d;
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px #0003, 0 2px 6px #0003;
+  --shadow-raised: 0 0 0 1px var(--line), 0 2px 10px #00000038;
+  --shadow-overlay: 0 0 0 1px var(--line-strong), 0 8px 28px #00000057;
+  --shadow-inset-field: inset 0 1px 2px #0006;
+}
+
+/* .band — always-dark inverted section, ailesh's third scope.
+   Nested under .dark it darkens further. */
+.band {
+  --page: #0c0b0e;
+  --canvas: #121114;
+  --surface: #1a191e;
+  --inset: #17161a;
+  --hover: #232228;
+  --hover-2: #2b2a31;
+  --field: #201f25;
+  --ink: #f4f1ea;
+  --ink-2: #a9a498;
+  --ink-3: #6e6a5f;
+  --line: #28272c;
+  --line-strong: #3a3940;
+  --accent: #6d64f0;
+  --accent-ink: #7c74f2;
+  --accent-tint: #6d64f029;
+  --green: #3fcf77;
+  --green-tint: #3fcf7724;
+}
+.dark .band {
+  --page: #080709;
+  --canvas: #0c0b0e;
+  --surface: #161519;
+  --line: #232228;
+  --line-strong: #34333a;
+}
+
+/* ── 3 · ailesh aliases ─────────────────────────────────────
+   The names aile.sh's existing CSS speaks, resolved to elia
+   tokens. Both vocabularies address the same palette. */
+:root,
+.dark,
+.band {
+  --bg: var(--page);
+  --bg2: var(--canvas);
+  --card: var(--surface);
+  --ink2: var(--ink-2);
+  --ink3: var(--ink-3);
+  --line2: var(--line-strong);
+  --acc: var(--accent);
+  --acc-h: var(--accent-ink);
+  --ok: var(--green);
+  --warn: var(--orange);
+  --bad: var(--red);
+  --text: var(--ink);
+  --text-2: var(--ink-2);
+  --text-3: var(--ink-3);
+  --border: var(--line);
+  --border-2: var(--line-strong);
+  --sans: var(--font-sans);
+  --mono: var(--font-mono);
+  --serif: var(--font-serif);
+}
+
+/* ── 4 · base ───────────────────────────────────────────── */
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizelegibility;
+}
+
+body {
+  background-color: var(--page);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  letter-spacing: -0.01em;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+}
+
+/* ── 5 · motion ─────────────────────────────────────────── */
+
+@keyframes shimmer-text {
+  0% { background-position: 150% center; }
+  100% { background-position: -50% center; }
+}
+@keyframes fade-up {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes eq-bounce {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+@keyframes stream-in {
+  0% { opacity: 0; filter: blur(4px); }
+  100% { opacity: 1; filter: blur(0); }
+}
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes spin {
+  100% { transform: rotate(1turn); }
+}
+@keyframes pixel-on {
+  0%, 100% { opacity: 0.15; }
+  18%, 42% { opacity: 1; }
+  62% { opacity: 0.15; }
+}
+
+/* ── 6 · component CSS ──────────────────────────────────── */
+
+/* shared card metrics */
+.primitive-card-pad { padding: 12px; }
+.primitive-card-bar,
+.primitive-card-footer,
+.primitive-table-cell { padding: 10px 12px; }
+.primitive-icon-button {
+  border-radius: var(--radius-control);
+  justify-content: center;
+  align-items: center;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+}
+
+/* demo-stage niceties */
+.primitive-showcase { user-select: none; }
+.primitive-showcase :is(input, textarea, [contenteditable="true"], pre, code) { user-select: text; }
+.primitive-showcase :is(a, button, [role="button"]) { -webkit-tap-highlight-color: transparent; }
+.primitive-showcase :is(a, button, [role="button"]):focus-visible { outline: none; }
+.primitive-showcase :is(img, svg, canvas) { -webkit-user-drag: none; }
+
+/* link underline that draws in */
+.animated-underline { display: inline-block; position: relative; }
+.animated-underline::after {
+  content: "";
+  transform-origin: 0 center;
+  height: 1px;
+  transition: transform 0.28s var(--ease-link);
+  background: currentcolor;
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  transform: scaleX(0);
+}
+a:hover .animated-underline::after,
+a:focus-visible .animated-underline::after { transform: scaleX(1); }
+
+/* source favicons */
+.source-avatar { box-shadow: 0 0 0 1px rgba(20, 19, 16, 0.1); }
+.dark .source-avatar { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12); }
+
+/* status pills (Filter Table) */
+.filter-status-todo,
+.filter-status-progress,
+.filter-status-done { border: 1px solid transparent; }
+.filter-status-todo {
+  color: color-mix(in srgb, #f09a2f 92%, var(--ink));
+  background: color-mix(in srgb, #f09a2f 20%, var(--surface));
+  border-color: color-mix(in srgb, #f09a2f 34%, var(--surface));
+}
+.filter-status-progress {
+  color: color-mix(in srgb, #16a6c7 92%, var(--ink));
+  background: color-mix(in srgb, #16a6c7 20%, var(--surface));
+  border-color: color-mix(in srgb, #16a6c7 34%, var(--surface));
+}
+.filter-status-done {
+  color: color-mix(in srgb, #25a878 92%, var(--ink));
+  background: color-mix(in srgb, #25a878 20%, var(--surface));
+  border-color: color-mix(in srgb, #25a878 34%, var(--surface));
+}
+
+/* insight charts */
+.insight-chart-stage { touch-action: pan-y; overflow: hidden; }
+.insight-chart-cursor {
+  z-index: 4;
+  background: var(--ink);
+  opacity: 0.26;
+  pointer-events: none;
+  width: 1px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.insight-chart-tooltip-anchor {
+  z-index: 5;
+  pointer-events: none;
+  position: absolute;
+  top: 8px;
+  transform: translate(-50%);
+}
+.insight-chart-tooltip {
+  border: 1px solid var(--tooltip-border);
+  min-width: 154px;
+  color: var(--tooltip-fg);
+  background: var(--tooltip-bg);
+  box-shadow: var(--shadow-overlay);
+  border-radius: 10px;
+  padding: 9px 10px;
+  font-size: 12px;
+}
+.insight-chart-tooltip-time {
+  color: var(--tooltip-muted);
+  margin-bottom: 7px;
+  font-size: 11px;
+  display: block;
+}
+.insight-chart-tooltip-row {
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  line-height: 1.65;
+  display: flex;
+}
+.insight-chart-tooltip-label {
+  color: var(--tooltip-fg);
+  align-items: center;
+  gap: 7px;
+  display: inline-flex;
+}
+.insight-chart-tooltip-row strong {
+  color: var(--tooltip-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+.insight-chart-tooltip-dot { border-radius: 50%; flex: 0 0 8px; width: 8px; height: 8px; }
+
+/* records table */
+.records-shell {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 10px;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.records-add-calculation,
+.records-company-header,
+.records-link,
+.records-strength { align-items: center; display: inline-flex; }
+.records-scroll {
+  overscroll-behavior: none;
+  scrollbar-color: var(--line-strong) transparent;
+  scrollbar-gutter: stable;
+  max-height: 438px;
+  overflow: auto;
+}
+.records-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.records-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  min-width: 990px;
+  color: var(--ink);
+  table-layout: fixed;
+  font-size: 12px;
+}
+.records-company-col { width: 270px; }
+.records-category-col { width: 275px; }
+.records-last-col { width: 190px; }
+.records-strength-col { width: 210px; }
+.records-link-col { width: 175px; }
+.records-table td,
+.records-table th {
+  border-right: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  text-align: left;
+  vertical-align: middle;
+}
+.records-table tr > :last-child { border-right: 0; }
+.records-table thead th {
+  z-index: 5;
+  background: var(--surface);
+  height: 42px;
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+.records-header-cell { padding: 0; }
+.records-header-cell.records-sticky-cell { z-index: 7; }
+.records-company-header,
+.records-header-button { gap: 8px; width: 100%; height: 42px; padding: 0 12px; }
+.records-company-header { padding-left: 6px; display: flex; }
+.records-company-header > span:not(.records-checkbox-box) { white-space: nowrap; }
+.records-header-button {
+  color: var(--ink-2);
+  text-align: left;
+  align-items: center;
+  transition: background-color 0.12s ease-out, color 0.12s ease-out;
+  display: flex;
+}
+.records-header-button:hover { background: var(--hover); color: var(--ink); }
+.records-header-icon { color: var(--ink-3); flex-shrink: 0; display: inline-flex; }
+.records-sort {
+  opacity: 0;
+  transition: opacity 0.12s ease-out, transform 0.16s var(--ease-out-strong);
+  flex-shrink: 0;
+  margin-left: auto;
+  display: inline-flex;
+}
+.records-header-button:hover .records-sort,
+.records-sort.is-visible { opacity: 1; }
+.records-checkbox {
+  border-radius: var(--radius-chip);
+  flex: 0 0 24px;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  position: relative;
+}
+.records-checkbox input { opacity: 0; width: 1px; height: 1px; position: absolute; }
+.records-checkbox-box {
+  color: #4d555e;
+  width: 18px;
+  height: 18px;
+  transition: border-color 0.14s ease-out, background-color 0.14s ease-out,
+    box-shadow 0.14s ease-out, transform 0.14s var(--ease-out-strong);
+  background: #fff;
+  border: 1px solid #c7cdd3;
+  border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+}
+.records-checkbox:hover .records-checkbox-box { background: #f2f4f5; border-color: #aeb6bf; }
+.records-checkbox:active .records-checkbox-box { transform: scale(0.96); }
+.records-checkbox input:focus-visible + .records-checkbox-box { outline: 2px solid var(--accent); outline-offset: 2px; }
+.records-checkbox-box.is-active { border-color: var(--accent); color: #fff; background: var(--accent); box-shadow: none; }
+.records-checkbox-dash { background: #4d555e; border-radius: 99px; width: 8px; height: 1.5px; }
+.dark .records-checkbox-box { color: #e0e4e8; background: #343a41; border-color: #4f565f; }
+.dark .records-checkbox:hover .records-checkbox-box { background: #3f464e; border-color: #626a74; }
+.dark .records-checkbox-box.is-active { border-color: var(--accent); color: #fff; background: var(--accent); }
+.dark .records-checkbox-dash { background: #e0e4e8; }
+.records-cell {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  height: 42px;
+  padding: 0 12px;
+  overflow: hidden;
+}
+.records-sticky-cell {
+  z-index: 2;
+  background: var(--surface);
+  position: sticky;
+  left: 0;
+  box-shadow: 5px 0 8px -10px rgba(0, 0, 0, 0.4);
+}
+.records-company-cell { align-items: center; gap: 4px; padding-left: 6px; display: flex; overflow: visible; }
+.records-row > .records-cell { transition: background-color 0.12s ease-out, color 0.12s ease-out; }
+.records-row:hover > .records-cell { background: var(--hover); }
+.records-row.is-selected > .records-cell { background: color-mix(in srgb, var(--accent) 7%, var(--surface)); }
+.records-company-mark {
+  width: 20px;
+  height: 20px;
+  color: var(--ink-2);
+  background: var(--field);
+  border: 0;
+  border-radius: 6px;
+  flex: 0 0 20px;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 650;
+  display: inline-flex;
+}
+.records-company-name {
+  min-width: 0;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 500;
+  overflow: hidden;
+}
+.records-company-name.has-link:hover,
+.records-company-name.has-link:focus-visible {
+  color: var(--accent-ink);
+  text-underline-offset: 3px;
+  text-decoration: underline;
+}
+.records-tags { gap: 4px; min-width: 0; display: flex; align-items: center; overflow: hidden; }
+.records-tag {
+  cursor: pointer;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--tag-color) 24%, var(--surface));
+  color: color-mix(in srgb, var(--tag-color) 82%, var(--ink));
+  background: color-mix(in srgb, var(--tag-color) 13%, var(--surface));
+  border-radius: 6px;
+  padding: 0 7px;
+  flex-shrink: 0;
+  max-width: 115px;
+  height: 23px;
+  display: inline-flex;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 500;
+  overflow: hidden;
+}
+.records-tag-dot { border-radius: 50%; flex: 0 0 5px; width: 5px; height: 5px; margin-right: 5px; }
+.records-more-tag {
+  border: 1px solid var(--line-strong);
+  background: var(--inset);
+  color: var(--ink-3);
+  height: 23px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 0 7px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-flex;
+}
+.records-muted { color: var(--ink-3); }
+.records-strength { color: var(--ink-2); gap: 8px; }
+.records-strength-dot { border-radius: 50%; flex: 0 0 8px; width: 8px; height: 8px; display: inline-block; }
+.records-link {
+  max-width: 100%;
+  color: var(--accent-ink);
+  text-overflow: ellipsis;
+  gap: 5px;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentcolor 35%, transparent);
+  text-underline-offset: 3px;
+  transition: color 0.12s ease-out, text-decoration-color 0.12s ease-out;
+  overflow: hidden;
+}
+.records-link:hover,
+.records-link:focus-visible { color: var(--ink); text-decoration-color: currentcolor; }
+.records-table tfoot td {
+  z-index: 4;
+  background: var(--inset);
+  height: 38px;
+  color: var(--ink-2);
+  font-size: 11.5px;
+  position: sticky;
+  bottom: 0;
+}
+.records-table tfoot .records-sticky-cell { z-index: 6; background: var(--inset); }
+.records-calculation-label { color: var(--ink-2); font-weight: 550; }
+.records-calculation-number { color: var(--ink); font-variant-numeric: tabular-nums; margin-right: 3px; }
+.records-add-calculation {
+  color: var(--ink-3);
+  transition: color 0.12s ease-out, transform 0.14s var(--ease-out-strong);
+  gap: 6px;
+}
+.records-add-calculation:hover { color: var(--ink); }
+.records-add-calculation:active { transform: scale(0.96); }
+.records-average { color: var(--ink-2); align-items: center; gap: 7px; display: inline-flex; }
+
+/* dialog */
+.elia-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(2px);
+}
