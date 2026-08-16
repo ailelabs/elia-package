@@ -5,8 +5,8 @@
  * elia.css to override the AILE brand tokens — components are
  * token-driven, nothing else changes.
  *
- *   @import "elia/styles/elia.css";
- *   @import "elia/styles/neutral.css";
+ *   @import "@aile.sh/elia/styles/elia.css";
+ *   @import "@aile.sh/elia/styles/neutral.css";
  * ═══════════════════════════════════════════════════════════ */
 
 :root {
