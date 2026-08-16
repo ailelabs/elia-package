@@ -453,7 +453,7 @@ a:focus-visible .animated-underline::after { transform: scaleX(1); }
 .records-company-header,
 .records-header-button { gap: 8px; width: 100%; height: 42px; padding: 0 12px; }
 .records-company-header { padding-left: 6px; display: flex; }
-.records-company-header > span:not(.records-checkbox-box) { white-space: nowrap; }
+.records-company-header > span { white-space: nowrap; }
 .records-header-button {
   color: var(--ink-2);
   text-align: left;
@@ -472,39 +472,6 @@ a:focus-visible .animated-underline::after { transform: scaleX(1); }
 }
 .records-header-button:hover .records-sort,
 .records-sort.is-visible { opacity: 1; }
-.records-checkbox {
-  border-radius: var(--radius-chip);
-  flex: 0 0 24px;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  height: 24px;
-  display: inline-flex;
-  position: relative;
-}
-.records-checkbox input { opacity: 0; width: 1px; height: 1px; position: absolute; }
-.records-checkbox-box {
-  color: #4d555e;
-  width: 18px;
-  height: 18px;
-  transition: border-color 0.14s ease-out, background-color 0.14s ease-out,
-    box-shadow 0.14s ease-out, transform 0.14s var(--ease-out-strong);
-  background: #fff;
-  border: 1px solid #c7cdd3;
-  border-radius: 6px;
-  justify-content: center;
-  align-items: center;
-  display: inline-flex;
-}
-.records-checkbox:hover .records-checkbox-box { background: #f2f4f5; border-color: #aeb6bf; }
-.records-checkbox:active .records-checkbox-box { transform: scale(0.96); }
-.records-checkbox input:focus-visible + .records-checkbox-box { outline: 2px solid var(--accent); outline-offset: 2px; }
-.records-checkbox-box.is-active { border-color: var(--accent); color: #fff; background: var(--accent); box-shadow: none; }
-.records-checkbox-dash { background: #4d555e; border-radius: 99px; width: 8px; height: 1.5px; }
-.dark .records-checkbox-box { color: #e0e4e8; background: #343a41; border-color: #4f565f; }
-.dark .records-checkbox:hover .records-checkbox-box { background: #3f464e; border-color: #626a74; }
-.dark .records-checkbox-box.is-active { border-color: var(--accent); color: #fff; background: var(--accent); }
-.dark .records-checkbox-dash { background: #e0e4e8; }
 .records-cell {
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -622,8 +589,156 @@ a:focus-visible .animated-underline::after { transform: scaleX(1); }
 .records-add-calculation:active { transform: scale(0.96); }
 .records-average { color: var(--ink-2); align-items: center; gap: 7px; display: inline-flex; }
 
-/* dialog */
+/* ── chart palette ────────────────────────────────────────
+ * Eight categorical slots, assigned in fixed order and never
+ * cycled. Both modes are selected, not flipped: the dark
+ * column is the same eight hues re-stepped for the dark
+ * surface. Validated (OKLab ΔE ×100, adjacent pairs):
+ *   light  worst CVD 8.2 · normal-vision 18.3 · all ≥3:1
+ *   dark   worst CVD 10.9 · normal-vision 17.5 · all ≥3:1
+ * Changing a value here means re-running that validation.
+ * ───────────────────────────────────────────────────────── */
+:root {
+  --chart-1: #4f46e5;
+  --chart-2: #c2610a;
+  --chart-3: #0f8a72;
+  --chart-4: #a16207;
+  --chart-5: #be3e82;
+  --chart-6: #17813f;
+  --chart-7: #1d6fd4;
+  --chart-8: #c2281d;
+  /* magnitude ramp — one hue, light → dark */
+  --chart-seq-1: #e8e7fb;
+  --chart-seq-2: #c5c2f4;
+  --chart-seq-3: #9b95ec;
+  --chart-seq-4: #7169e8;
+  --chart-seq-5: #4f46e5;
+  --chart-seq-6: #3730b0;
+  --chart-grid: var(--line);
+}
+.dark,
+.band {
+  --chart-1: #6d64f0;
+  --chart-2: #c4741f;
+  --chart-3: #23a07f;
+  --chart-4: #b58200;
+  --chart-5: #dd6494;
+  --chart-6: #1d8449;
+  --chart-7: #4a94e8;
+  --chart-8: #e5544a;
+  --chart-seq-1: #26224a;
+  --chart-seq-2: #332d70;
+  --chart-seq-3: #453da0;
+  --chart-seq-4: #5a51c8;
+  --chart-seq-5: #6d64f0;
+  --chart-seq-6: #9089f4;
+}
+
+/* slider — native range, fill fed by --fill so drag costs no JS */
+.elia-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  display: block;
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
+}
+.elia-range:disabled { cursor: not-allowed; }
+.elia-range:focus { outline: none; }
+.elia-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 99px;
+  background: linear-gradient(to right, var(--accent) var(--fill, 0%), var(--inset) var(--fill, 0%));
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.elia-range::-moz-range-track {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--inset);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.elia-range::-moz-range-progress { height: 4px; border-radius: 99px; background: var(--accent); }
+.elia-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 99px;
+  background: var(--surface);
+  box-shadow: var(--shadow-btn);
+  transition: transform 150ms var(--ease-out-strong), box-shadow 150ms ease;
+}
+.elia-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 99px;
+  background: var(--surface);
+  box-shadow: var(--shadow-btn);
+  transition: transform 150ms var(--ease-out-strong), box-shadow 150ms ease;
+}
+.elia-range:hover::-webkit-slider-thumb { transform: scale(1.12); }
+.elia-range:hover::-moz-range-thumb { transform: scale(1.12); }
+.elia-range:active::-webkit-slider-thumb { transform: scale(0.94); }
+.elia-range:active::-moz-range-thumb { transform: scale(0.94); }
+.elia-range:focus-visible::-webkit-slider-thumb { box-shadow: var(--shadow-btn), 0 0 0 2px var(--accent); }
+.elia-range:focus-visible::-moz-range-thumb { box-shadow: var(--shadow-btn), 0 0 0 2px var(--accent); }
+
+/* drawer entrances — one per edge */
+@keyframes drawer-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes drawer-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+@keyframes drawer-in-bottom {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes drawer-out-right {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+@keyframes drawer-out-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+@keyframes drawer-out-bottom {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+
+/* dialog
+ * A closed <dialog> is hidden only by the UA's `display:none`,
+ * which any display utility (flex, grid…) outranks on
+ * specificity — leaving the panel rendered inline on the page.
+ * This guard keeps closed dialogs closed no matter what
+ * classes the component carries. */
+.elia-dialog:not([open]) {
+  display: none;
+}
+/* Tailwind's preflight zeroes margin on `*`, which outranks the UA's
+   `dialog { margin: auto }` — the rule that centres a modal dialog.
+   Without this every dialog sits in the top-left corner. Components
+   that pin to an edge (Drawer) override with important utilities. */
+.elia-dialog {
+  margin: auto;
+}
 .elia-dialog::backdrop {
   background: rgba(0, 0, 0, 0.32);
   backdrop-filter: blur(2px);
+}
+/* the backdrop used to snap in at full strength, which reads as a
+   pop no matter how smoothly the panel itself moves */
+@keyframes elia-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.elia-dialog[open]::backdrop {
+  animation: elia-backdrop-in 220ms var(--ease-out-strong) both;
 }

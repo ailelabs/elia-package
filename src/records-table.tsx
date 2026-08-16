@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Checkbox as BaseCheckbox } from "./base/checkbox";
 
 /* ─────────────────────────────────────────────────────────
  * RECORDS TABLE — a compact CRM grid with the details that
@@ -94,14 +95,17 @@ function Icon({ children, size = 14, strokeWidth = 1.8 }: { children: React.Reac
   );
 }
 
+/* the table's cell-sized hit area around the shared base control */
 function Checkbox({ checked, mixed = false, onChange, label }: { checked: boolean; mixed?: boolean; onChange: () => void; label: string }) {
   return (
-    <label className="records-checkbox" title={label}>
-      <input type="checkbox" checked={checked} onChange={onChange} aria-label={label} />
-      <span className={`records-checkbox-box ${checked || mixed ? "is-active" : ""}`}>
-        {mixed ? <span className="records-checkbox-dash" /> : checked ? <Icon size={12}><path d="m5 12 4 4L19 6" /></Icon> : null}
-      </span>
-    </label>
+    <BaseCheckbox
+      className="size-6 shrink-0 justify-center"
+      checked={checked}
+      indeterminate={mixed}
+      onChange={onChange}
+      aria-label={label}
+      title={label}
+    />
   );
 }
 

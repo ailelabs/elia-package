@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useId, useLayoutEffect, useRef } from "react";
 import { cx } from "./cx";
 
 /* ─────────────────────────────────────────────────────────
@@ -16,13 +16,21 @@ export type DialogProps = Omit<React.DialogHTMLAttributes<HTMLDialogElement>, "o
   title?: React.ReactNode;
   footer?: React.ReactNode;
   width?: number | string;
+  /** Drops the header, padding and close button — the shell only. */
+  bare?: boolean;
 };
 
-export function Dialog({ open, onClose, title, footer, width = 400, children, className, ...rest }: DialogProps) {
+export function Dialog({ open, onClose, title, footer, width = 400, bare, children, className, ...rest }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  /* a dismiss must BEGIN on the backdrop: otherwise the very click
+     that opened the dialog completes over the backdrop and shuts it,
+     and a drag that starts inside and releases outside does too */
+  const pressedBackdrop = useRef(false);
 
-  useEffect(() => {
+  /* layout effect: show before paint so the entry animation owns
+     the first frame instead of the element appearing then moving */
+  useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     if (open && !el.open) el.showModal();
@@ -34,14 +42,23 @@ export function Dialog({ open, onClose, title, footer, width = 400, children, cl
       ref={ref}
       aria-labelledby={title ? titleId : undefined}
       onClose={onClose}
-      onClick={(event) => {
+      onPointerDown={(event) => {
         /* only the backdrop is the dialog element itself */
-        if (event.target === ref.current) onClose();
+        pressedBackdrop.current = event.target === ref.current;
+      }}
+      onClick={(event) => {
+        const dismiss = event.target === ref.current && pressedBackdrop.current;
+        pressedBackdrop.current = false;
+        if (dismiss) onClose();
       }}
       className={cx("elia-dialog rounded-card bg-surface p-0 text-ink shadow-overlay", className)}
       style={{ width, maxWidth: "calc(100vw - 32px)", animation: open ? "pop-in 200ms cubic-bezier(0.23,1,0.32,1) both" : undefined }}
       {...rest}
     >
+      {bare ? (
+        children
+      ) : (
+        <>
       <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-1">
         <span id={titleId} className="text-[13px] font-semibold text-ink">{title}</span>
         <button
@@ -57,6 +74,8 @@ export function Dialog({ open, onClose, title, footer, width = 400, children, cl
       </div>
       <div className="px-4 py-2 text-[12.5px] leading-relaxed text-ink-2">{children}</div>
       {footer && <div className="flex justify-end gap-2 px-4 pt-1 pb-4">{footer}</div>}
+        </>
+      )}
     </dialog>
   );
 }

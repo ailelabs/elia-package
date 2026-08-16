@@ -1,6 +1,9 @@
 /* elia base — the foundational component set */
 export * from "./base";
 
+/* elia charts — SVG data visualization on the chart palette */
+export * from "./charts";
+
 /* elia — AI-native primitives */
 export { default as LoadingState } from "./loading-state";
 export type { LoadingStateProps } from "./loading-state";
