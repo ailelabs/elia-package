@@ -4,11 +4,11 @@ An open design system for AI-native interfaces. Tokens, base components, charts,
 and agent primitives for **React 19** and **Tailwind CSS v4**.
 
 ```bash
-npm install elia
+npm install @aile.sh/elia
 ```
 
 ```bash
-bun add elia      # pnpm add elia · yarn add elia
+bun add @aile.sh/elia      # pnpm add @aile.sh/elia · yarn add @aile.sh/elia
 ```
 
 ## Setup
@@ -17,11 +17,11 @@ Import the stylesheet once, at the root of your app. It carries the tokens,
 keyframes, and the Tailwind v4 `@theme` bridge that every component draws from.
 
 ```ts
-import "elia/styles/elia.css";
+import "@aile.sh/elia/styles/elia.css";
 ```
 
 ```tsx
-import { Button, Card, DatePicker } from "elia";
+import { Button, Card, DatePicker } from "@aile.sh/elia";
 
 export function Example() {
   return (
