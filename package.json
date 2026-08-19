@@ -1,6 +1,6 @@
 {
   "name": "@aile.sh/elia",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "elia — an open design system for AI-native interfaces. Tokens, base components, and agent primitives for React 19 + Tailwind v4.",
   "license": "MIT",
   "repository": {
