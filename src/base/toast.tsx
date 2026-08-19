@@ -31,10 +31,35 @@ const subscribe = (listener: () => void) => {
 };
 const EMPTY: ToastItem[] = [];
 
-export function toast(message: React.ReactNode, options: { tone?: ToastTone; duration?: number } = {}) {
+function push(message: React.ReactNode, options: { tone?: ToastTone; duration?: number } = {}) {
   queue = [...queue, { id: nextId++, message, tone: options.tone ?? "neutral", duration: options.duration ?? 3500 }];
   emit();
 }
+
+function update(id: number, patch: Partial<Omit<ToastItem, "id">>) {
+  queue = queue.map((item) => (item.id === id ? { ...item, ...patch } : item));
+  emit();
+}
+
+type PromiseMessages<T> = {
+  loading: React.ReactNode;
+  success: React.ReactNode | ((value: T) => React.ReactNode);
+  error: React.ReactNode | ((reason: unknown) => React.ReactNode);
+};
+
+/* toast.promise — a loading toast that resolves in place */
+function promiseToast<T>(promise: Promise<T>, messages: PromiseMessages<T>): Promise<T> {
+  const id = nextId++;
+  queue = [...queue, { id, message: messages.loading, tone: "neutral", duration: Infinity }];
+  emit();
+  promise.then(
+    (value) => update(id, { message: typeof messages.success === "function" ? messages.success(value) : messages.success, tone: "green", duration: 3500 }),
+    (reason) => update(id, { message: typeof messages.error === "function" ? messages.error(reason) : messages.error, tone: "red", duration: 3500 }),
+  );
+  return promise;
+}
+
+export const toast = Object.assign(push, { promise: promiseToast });
 
 function dismiss(id: number) {
   queue = queue.filter((item) => item.id !== id);
@@ -47,6 +72,7 @@ function ToastCard({ item }: { item: ToastItem }) {
   const remaining = useRef(item.duration);
 
   const resume = () => {
+    if (!Number.isFinite(remaining.current)) return; // loading toasts wait for their promise
     startedAt.current = Date.now();
     timer.current = window.setTimeout(() => dismiss(item.id), remaining.current);
   };
@@ -56,10 +82,11 @@ function ToastCard({ item }: { item: ToastItem }) {
   };
 
   useEffect(() => {
+    remaining.current = item.duration; // restarts when toast.promise settles in place
     resume();
     return () => window.clearTimeout(timer.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [item.duration, item.tone]);
 
   return (
     <div
@@ -74,6 +101,7 @@ function ToastCard({ item }: { item: ToastItem }) {
         className={cx(
           "size-2 shrink-0 rounded-full",
           item.tone === "green" ? "bg-green" : item.tone === "red" ? "bg-red" : "bg-ink-3",
+          !Number.isFinite(item.duration) && "animate-pulse",
         )}
       />
       <span className="min-w-0">{item.message}</span>

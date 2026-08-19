@@ -46,9 +46,11 @@ export {
   type TableRowProps,
   type TableHeaderProps,
   type TableCellProps,
+  useTableSort,
   type TableSort,
 } from "./table";
 export { Accordion, AccordionItem } from "./accordion";
+export { Collapsible, type CollapsibleProps } from "./collapsible";
 export { Tabs, type TabItem } from "./tabs";
 export { Segmented, type SegmentedOption } from "./segmented";
 export { Tooltip, type TooltipProps } from "./tooltip";

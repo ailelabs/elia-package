@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { cx } from "./cx";
 
 /* ─────────────────────────────────────────────────────────
@@ -174,4 +174,45 @@ export function TableCell({ align = "left", mono, muted, className, ...rest }: T
 
 export function TableCaption({ className, ...rest }: React.ComponentProps<"caption">) {
   return <caption className={cx("px-3 py-2 text-left text-[11.5px] text-ink-3", className)} {...rest} />;
+}
+
+/* ─────────────────────────────────────────────────────────
+ * useTableSort — the sorting logic the display-only headers
+ * leave to you. Cycles asc → desc → off per column; strings
+ * compare via localeCompare, everything else numerically.
+ * Spread `headerProps(key)` onto each sortable TableHeader.
+ * ───────────────────────────────────────────────────────── */
+
+export function useTableSort<T>(data: readonly T[]) {
+  const [key, setKey] = useState<keyof T | null>(null);
+  const [dir, setDir] = useState<TableSort>(null);
+
+  const rows = useMemo(() => {
+    if (!key || !dir) return [...data];
+    return [...data].sort((a, b) => {
+      const x = a[key];
+      const y = b[key];
+      const order =
+        typeof x === "string" && typeof y === "string" ? x.localeCompare(y) : Number(x) - Number(y);
+      return dir === "asc" ? order : -order;
+    });
+  }, [data, key, dir]);
+
+  const headerProps = (k: keyof T) => ({
+    sortable: true,
+    sort: key === k ? dir : null,
+    onSort: () => {
+      if (key !== k) {
+        setKey(k);
+        setDir("asc");
+      } else if (dir === "asc") {
+        setDir("desc");
+      } else {
+        setKey(null);
+        setDir(null);
+      }
+    },
+  });
+
+  return { rows, headerProps };
 }

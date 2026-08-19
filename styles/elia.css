@@ -742,3 +742,12 @@ a:focus-visible .animated-underline::after { transform: scaleX(1); }
 .elia-dialog[open]::backdrop {
   animation: elia-backdrop-in 220ms var(--ease-out-strong) both;
 }
+
+/* scroll fade — masks a scroll container's clipped edges so
+   overflow reads as "more content", not a hard cut */
+.elia-scroll-fade-y {
+  mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent);
+}
+.elia-scroll-fade-x {
+  mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
+}
