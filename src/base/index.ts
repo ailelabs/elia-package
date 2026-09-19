@@ -1,7 +1,7 @@
 /* elia base — the foundational component set */
 export { cx } from "./cx";
 export { Button, IconButton, type ButtonProps, type IconButtonProps } from "./button";
-export { Kbd } from "./kbd";
+export { Kbd, type KbdProps } from "./kbd";
 export { Input, Textarea } from "./input";
 export { PasswordInput, DEFAULT_PASSWORD_RULES, type PasswordInputProps, type PasswordRule } from "./password-input";
 export { PhoneInput, type PhoneInputProps } from "./phone-input";

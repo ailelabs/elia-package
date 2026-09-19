@@ -169,7 +169,7 @@ export function Command({
             }}
             className="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-ink-3"
           />
-          <Kbd>esc</Kbd>
+          <Kbd>Esc</Kbd>
         </div>
 
         {/* results */}
