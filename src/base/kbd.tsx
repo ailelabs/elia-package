@@ -23,7 +23,7 @@ export function Kbd({ size = "md", className, ...rest }: KbdProps) {
   return (
     <kbd
       className={cx(
-        "inline-flex items-center justify-center bg-surface font-mono text-ink-3 shadow-hairline",
+        "inline-flex items-center justify-center bg-surface font-mono text-ink-3 shadow-hairline leading-normal",
         SIZES[size],
         className,
       )}
