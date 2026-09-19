@@ -15,11 +15,13 @@ const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 const formatPercent = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(2)}%`;
 const formatMoney = (v: number) => `$${Math.round(v).toLocaleString("en-US")}`;
-const SNAPSHOT_END = Math.floor(Date.now() / 1000);
-
+/* Liveline windows on the live clock, so the snapshot ends at mount
+   (callers memoize), not module load — a stale anchor pushes every
+   point out of the ~42s window and the chart goes empty. */
 function makePoints(values: number[], gap = 6): LivelinePoint[] {
+  const end = Date.now() / 1000;
   return values.map((value, index) => ({
-    time: SNAPSHOT_END - (values.length - 1 - index) * gap,
+    time: end - (values.length - 1 - index) * gap,
     value,
   }));
 }
