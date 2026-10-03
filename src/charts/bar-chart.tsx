@@ -24,7 +24,10 @@ import {
  * and a recessive grid behind everything.
  *
  * Hover is per-bar for grouped and per-category for stacked,
- * because a stack's story is its total and its split.
+ * because a stack's story is its total and its split. The
+ * whole band is the hit target, not just the painted mark,
+ * and the tooltip clears as soon as the pointer is over no
+ * band — a short bar must not leave a stale card behind.
  * ───────────────────────────────────────────────────────── */
 
 export interface BarChartProps {
@@ -59,6 +62,20 @@ export function barPath(x: number, y: number, w: number, h: number, side: "top" 
     return `M${x},${y + h} L${x},${y + r} Q${x},${y} ${x + r},${y} L${x + w - r},${y} Q${x + w},${y} ${x + w},${y + r} L${x + w},${y + h} Z`;
   }
   return `M${x},${y} L${x + w - r},${y} Q${x + w},${y} ${x + w},${y + r} L${x + w},${y + h - r} Q${x + w},${y + h} ${x + w - r},${y + h} L${x},${y + h} Z`;
+}
+
+/* the category whose band holds `pos` on the category axis,
+   or null outside every band */
+export function bandAt(pos: number, start: number, bandSize: number, count: number): number | null {
+  if (!(bandSize > 0) || count <= 0) return null;
+  const i = Math.floor((pos - start) / bandSize);
+  return i >= 0 && i < count ? i : null;
+}
+
+/* draw every `n`th category label so none collide: ~46px per
+   label across columns (as the line chart), 14px per row */
+export function labelStride(bandSize: number, horizontal?: boolean) {
+  return Math.max(1, Math.ceil((horizontal ? 14 : 46) / Math.max(bandSize, 1)));
 }
 
 export function BarChart({
@@ -119,7 +136,28 @@ export function BarChart({
   const inner = Math.max(1, bandSize - bandPad);
   const barW = stacked ? inner : Math.max(1, inner / Math.max(active.length, 1));
 
-  const bandStart = (i: number) => (horizontal ? pad.top : pad.left) + i * bandSize + bandPad / 2;
+  const bandOrigin = horizontal ? pad.top : pad.left;
+  const bandStart = (i: number) => bandOrigin + i * bandSize + bandPad / 2;
+  /* counted back from the last label, so the newest always shows */
+  const stride = labelStride(bandSize, horizontal);
+
+  const onMove = (event: React.MouseEvent<SVGSVGElement>) => {
+    const box = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - box.left;
+    const y = event.clientY - box.top;
+    const along = horizontal ? y : x;
+    const across = horizontal ? x : y;
+    const inPlot = horizontal
+      ? across >= pad.left && across <= pad.left + plotW
+      : across >= pad.top && across <= pad.top + plotH;
+    const category = inPlot && active.length ? bandAt(along, bandOrigin, bandSize, labels.length) : null;
+    /* an empty stack has nothing to say: no card, nothing dimmed */
+    if (category === null || (stacked && !active.some((s) => (s.data[category] ?? 0) !== 0))) return setHover(null);
+    const slot = stacked
+      ? undefined
+      : Math.min(active.length - 1, Math.max(0, Math.floor((along - bandStart(category)) / barW)));
+    setHover({ x, y, category, series: slot });
+  };
 
   const toggle = (id: string) =>
     setHidden((current) => {
@@ -133,7 +171,8 @@ export function BarChart({
 
   const tooltipRows = hover
     ? stacked || hover.series === undefined
-      ? active.map((s, i) => ({
+      ? /* a series with nothing in this category adds only noise */
+        active.filter((s) => (s.data[hover.category] ?? 0) !== 0).map((s) => ({
           label: s.label ?? s.id,
           value: formatValue(s.data[hover.category] ?? 0),
           color: s.color ?? seriesColor(series.indexOf(s)),
@@ -172,7 +211,13 @@ export function BarChart({
     >
       <div ref={ref} className="relative w-full" style={{ height }} onMouseLeave={() => setHover(null)}>
         {width > 0 && (
-          <svg width={width} height={height} role="img" aria-label={typeof title === "string" ? title : "Bar chart"}>
+          <svg
+            width={width}
+            height={height}
+            role="img"
+            aria-label={typeof title === "string" ? title : "Bar chart"}
+            onMouseMove={onMove}
+          >
             <GridLines
               ticks={ticks}
               scale={vScale}
@@ -195,17 +240,19 @@ export function BarChart({
             ))}
 
             {/* category labels */}
-            {labels.map((label, i) => (
-              <text
-                key={label + i}
-                {...AXIS_TEXT}
-                x={horizontal ? pad.left - 8 : bandStart(i) + inner / 2}
-                y={horizontal ? bandStart(i) + inner / 2 + 3.5 : height - 6}
-                textAnchor={horizontal ? "end" : "middle"}
-              >
-                {label}
-              </text>
-            ))}
+            {labels.map((label, i) =>
+              (labels.length - 1 - i) % stride === 0 ? (
+                <text
+                  key={label + i}
+                  {...AXIS_TEXT}
+                  x={horizontal ? pad.left - 8 : bandStart(i) + inner / 2}
+                  y={horizontal ? bandStart(i) + inner / 2 + 3.5 : height - 6}
+                  textAnchor={horizontal ? "end" : "middle"}
+                >
+                  {label}
+                </text>
+              ) : null,
+            )}
 
             {/* baseline */}
             <line
@@ -279,15 +326,6 @@ export function BarChart({
                                 animation: `fade-up 420ms ${category * 40}ms var(--ease-out-strong) both`,
                               }
                         }
-                        onMouseMove={(event) => {
-                          const box = (event.currentTarget.ownerSVGElement as SVGSVGElement).getBoundingClientRect();
-                          setHover({
-                            x: event.clientX - box.left,
-                            y: event.clientY - box.top,
-                            category,
-                            series: stacked ? undefined : slot,
-                          });
-                        }}
                         onClick={() =>
                           onBarClick?.({ series: s.id, label, value })
                         }
@@ -300,7 +338,7 @@ export function BarChart({
           </svg>
         )}
 
-        {hover && (
+        {hover && tooltipRows.length > 0 && (
           <ChartTooltip x={hover.x} y={hover.y} title={labels[hover.category]} rows={tooltipRows} width={width} />
         )}
       </div>

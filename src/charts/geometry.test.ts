@@ -4,7 +4,7 @@
 
 import { expect, test } from "bun:test";
 import { niceScale } from "./shared";
-import { barPath } from "./bar-chart";
+import { bandAt, barPath, labelStride } from "./bar-chart";
 import { arc } from "./pie-chart";
 import { smoothPath } from "./line-chart";
 
@@ -58,6 +58,27 @@ test("barPath clamps the radius on bars thinner than it", () => {
   /* a 3px-wide bar must not grow a 4px corner */
   noNaN(barPath(0, 0, 3, 40, "top"));
   noNaN(barPath(0, 0, 40, 3, "right"));
+});
+
+test("bandAt hit-tests the whole band and nothing outside it", () => {
+  /* 30 bands of 20px starting at x=50 */
+  expect(bandAt(50, 50, 20, 30)).toBe(0);
+  expect(bandAt(69.9, 50, 20, 30)).toBe(0); // band padding still counts
+  expect(bandAt(70, 50, 20, 30)).toBe(1);
+  expect(bandAt(649.9, 50, 20, 30)).toBe(29);
+  expect(bandAt(49, 50, 20, 30)).toBeNull(); // the axis gutter
+  expect(bandAt(650, 50, 20, 30)).toBeNull(); // past the last band
+  expect(bandAt(60, 50, 0, 30)).toBeNull();
+  expect(bandAt(60, 50, NaN, 30)).toBeNull();
+});
+
+test("labelStride keeps column labels ~46px apart and rows 14px apart", () => {
+  expect(labelStride(60)).toBe(1);
+  expect(labelStride(38)).toBe(2); // 31 days across ~1,190px
+  expect(labelStride(11)).toBe(5); // 31 days across a phone
+  expect(labelStride(14, true)).toBe(1);
+  expect(labelStride(5, true)).toBe(3);
+  expect(labelStride(0)).toBe(46); // no width yet: still finite
 });
 
 test("arc produces a wedge for a pie and a ring for a doughnut", () => {
