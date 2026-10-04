@@ -110,6 +110,26 @@ test("smoothPath interpolates without inventing endpoints", () => {
   expect(d.split("C").length - 1).toBe(3); // one curve per gap
 });
 
+test("smoothPath never leaves the range of the two points it joins", () => {
+  /* a flat zero, a spike, flat again — Catmull-Rom dipped below the zero
+     on both sides of the spike. Pixel y: 200 is the baseline, 10 the peak. */
+  const points: [number, number][] = [[0, 200], [10, 200], [20, 200], [30, 10], [40, 200], [50, 200], [60, 120], [70, 130]];
+  const d = smoothPath(points);
+  noNaN(d);
+  const segments = d.split(" C").slice(1).map((s) => s.split(" ").map((p) => p.split(",").map(Number)));
+  expect(segments.length).toBe(points.length - 1);
+  segments.forEach(([c1, c2, end], i) => {
+    const lo = Math.min(points[i][1], points[i + 1][1]);
+    const hi = Math.max(points[i][1], points[i + 1][1]);
+    /* a cubic stays inside its control points' hull */
+    for (const [, y] of [c1, c2]) {
+      expect(y).toBeGreaterThanOrEqual(lo - 1e-9);
+      expect(y).toBeLessThanOrEqual(hi + 1e-9);
+    }
+    expect(end).toEqual(points[i + 1]);
+  });
+});
+
 test("smoothPath degrades safely on short inputs", () => {
   expect(smoothPath([])).toBe("");
   expect(smoothPath([[1, 1]])).toBe("");

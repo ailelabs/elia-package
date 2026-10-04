@@ -43,18 +43,36 @@ export interface LineChartProps {
   className?: string;
 }
 
-/* Catmull-Rom → cubic bézier. Kept mild (tension 0.2) so the
-   curve never invents a peak the data doesn't have. */
+/* Monotone cubic (Fritsch–Carlson, as d3's curveMonotoneX):
+   each segment stays between its two points, so the curve
+   never invents a peak — or a dip below a flat zero — the
+   data doesn't have. Catmull-Rom, which this replaced, took
+   its tangents from the neighbours and swung past them. */
 export function smoothPath(points: [number, number][]) {
   if (points.length < 2) return "";
+  const n = points.length;
+  const secant = (i: number) => {
+    const dx = points[i + 1][0] - points[i][0];
+    return dx ? (points[i + 1][1] - points[i][1]) / dx : 0;
+  };
+  const tangent = (i: number) => {
+    if (i === 0) return secant(0);
+    if (i === n - 1) return secant(n - 2);
+    const a = secant(i - 1);
+    const b = secant(i);
+    const h0 = points[i][0] - points[i - 1][0];
+    const h1 = points[i + 1][0] - points[i][0];
+    const p = h0 + h1 ? (a * h1 + b * h0) / (h0 + h1) : 0;
+    /* a turn or a flat neighbour gives 0: the curve flattens
+       there instead of swinging past the point */
+    return (Math.sign(a) + Math.sign(b)) * Math.min(Math.abs(a), Math.abs(b), 0.5 * Math.abs(p)) || 0;
+  };
   let d = `M${points[0][0]},${points[0][1]}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i - 1] ?? points[i];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[i + 2] ?? p2;
-    const t = 0.2;
-    d += ` C${p1[0] + (p2[0] - p0[0]) * t},${p1[1] + (p2[1] - p0[1]) * t} ${p2[0] - (p3[0] - p1[0]) * t},${p2[1] - (p3[1] - p1[1]) * t} ${p2[0]},${p2[1]}`;
+  for (let i = 0; i < n - 1; i++) {
+    const [x1, y1] = points[i];
+    const [x2, y2] = points[i + 1];
+    const dx = (x2 - x1) / 3;
+    d += ` C${x1 + dx},${y1 + tangent(i) * dx} ${x2 - dx},${y2 - tangent(i + 1) * dx} ${x2},${y2}`;
   }
   return d;
 }
@@ -114,7 +132,8 @@ export function LineChart({
       return next;
     });
 
-  /* label every ~70px so ticks never collide */
+  /* label every ~46px, counted back from the last label so it
+     always shows and never lands on the one before it */
   const labelStride = Math.max(1, Math.ceil((labels.length * 46) / Math.max(plotW, 1)));
   const showLegend = legend ?? series.length > 1;
 
@@ -161,7 +180,7 @@ export function LineChart({
             ))}
 
             {labels.map((label, i) =>
-              i % labelStride === 0 || i === labels.length - 1 ? (
+              (labels.length - 1 - i) % labelStride === 0 ? (
                 <text
                   key={label + i}
                   {...AXIS_TEXT}
