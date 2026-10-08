@@ -40,6 +40,9 @@ export interface LineChartProps {
   showTable?: boolean;
   /** Dashed horizontal rule — a target, budget, or SLA. */
   reference?: { value: number; label?: string };
+  /** The last point is still filling (today, this hour): the
+      segment into it is dashed. */
+  partial?: boolean;
   className?: string;
 }
 
@@ -93,6 +96,7 @@ export function LineChart({
   legend,
   showTable,
   reference,
+  partial,
   className,
 }: LineChartProps) {
   const { ref, width } = useSize<HTMLDivElement>();
@@ -229,6 +233,17 @@ export function LineChart({
               const points = s.data.map((value, i) => [xAt(i), yAt(value)] as [number, number]);
               const d = curve ? smoothPath(points) : linePath(points);
               const only = active.length === 1;
+              /* `partial`: the final command is the last segment —
+                 cut it off the solid stroke and redraw it dashed */
+              const cut = partial && points.length > 1 ? d.lastIndexOf(curve ? " C" : " L") : -1;
+              const [px, py] = points[points.length - 2] ?? [0, 0];
+              const stroke = {
+                fill: "none",
+                stroke: color,
+                strokeWidth: 2,
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+              } as const;
 
               return (
                 <g key={s.id}>
@@ -239,14 +254,8 @@ export function LineChart({
                       opacity={0.12}
                     />
                   )}
-                  <path
-                    d={d}
-                    fill="none"
-                    stroke={color}
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d={cut < 0 ? d : d.slice(0, cut)} {...stroke} />
+                  {cut >= 0 && <path d={`M${px},${py}${d.slice(cut)}`} {...stroke} strokeDasharray="2 5" />}
                 </g>
               );
             })}
